@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>LOVOW への招待</title>
+<style>
+:root { --bg:#faf8ff; --ink:#2b2840; --soft:#5d5975; --line:#e6e1f5; --accent:#6c5ce7; --card:#ffffff; }
+@media (prefers-color-scheme: dark) { :root { --bg:#17151f; --ink:#ece9f7; --soft:#b6b1cc; --line:#2e2a3d; --accent:#a99cff; --card:#211e2c; } }
+body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.7 -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+main { max-width:480px; margin:0 auto; padding:40px 16px 64px; text-align:center; }
+h1 { font-size:1.5rem; line-height:1.4; margin:0 0 8px; }
+p { color:var(--soft); margin:0 0 16px; }
+.heart { font-size:2.5rem; color:#f58fb0; margin-bottom:8px; }
+.button { display:block; box-sizing:border-box; width:100%; padding:16px; border-radius:999px; text-decoration:none; font-weight:700; margin:12px 0; }
+.primary { background:var(--accent); color:#fff; }
+.secondary { background:var(--card); color:var(--ink); border:1px solid var(--line); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:20px; margin:24px 0; }
+.code { font-size:1.8rem; font-weight:700; letter-spacing:.25em; color:var(--ink); }
+small { color:var(--soft); }
+a { color:var(--accent); }
+[hidden] { display:none !important; }
+</style>
+</head>
+<body><main>
+<div class="heart" aria-hidden="true">♡</div>
+<h1 data-i18n="title">LOVOW への招待が届いています</h1>
+<p data-i18n="lead">大切な人と、気持ちを「小さな行動」にしていくアプリです。</p>
+
+<section id="ios" hidden>
+  <a id="open" class="button primary" href="#" data-i18n="open">LOVOW で開く</a>
+  <a class="button secondary" href="https://apps.apple.com/app/id6818636846" data-i18n="get">App Store で入手</a>
+  <div id="codeCard" class="card" hidden>
+    <p data-i18n="codeHint">アプリを入れたあとは「設定 → パートナー → 招待コードを入力する」に、このコードを入力してください。</p>
+    <div id="code" class="code"></div>
+  </div>
+</section>
+
+<section id="android" hidden>
+  <div class="card"><p data-i18n="android">Android 版は準備中です。公開までもう少しお待ちください。</p></div>
+</section>
+
+<section id="other" hidden>
+  <div class="card"><p data-i18n="other">iPhone のカメラで、招待の QR コードを読み取ってください。</p></div>
+</section>
+
+<section id="invalid" hidden>
+  <div class="card"><p data-i18n="invalid">招待の情報が見つかりませんでした。招待した方に、もう一度 QR コードを見せてもらってください。</p></div>
+</section>
+
+<small><a href="../support/" data-i18n="support">サポート</a> · <a href="../privacy/" data-i18n="privacy">プライバシーポリシー</a></small>
+
+<script>
+(function () {
+  var en = {
+    title: 'You have an invitation to LOVOW',
+    lead: 'An app for turning your feelings for someone into small actions.',
+    open: 'Open in LOVOW',
+    get: 'Get it on the App Store',
+    codeHint: 'After installing, enter this code in Settings → Partner → Enter an invite code.',
+    android: 'The Android version is on its way. Thank you for waiting.',
+    other: 'Scan the invitation QR code with your iPhone camera.',
+    invalid: "We couldn't find the invitation. Please ask for the QR code again.",
+    support: 'Support',
+    privacy: 'Privacy Policy'
+  };
+  if (!/^ja\b/i.test(navigator.language || '')) {
+    document.documentElement.lang = 'en';
+    document.title = en.title;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var v = en[el.getAttribute('data-i18n')];
+      if (v) el.textContent = v;
+    });
+    document.querySelector('a[href="../support/"]').href = '../support/en/';
+    document.querySelector('a[href="../privacy/"]').href = '../privacy/en/';
+  }
+
+  var params = new URLSearchParams(location.search);
+  // The token is random base64url (no personal data); the code is 8 letters/digits.
+  var token = params.get('t') || '';
+  var code = params.get('c') || '';
+  if (!/^[A-Za-z0-9_-]{16,64}$/.test(token)) token = '';
+  if (!/^[A-Za-z0-9]{4,12}$/.test(code)) code = '';
+
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  var isAndroid = /Android/.test(ua);
+
+  if (!token) { document.getElementById('invalid').hidden = false; return; }
+  if (isAndroid) { document.getElementById('android').hidden = false; return; }
+  if (!isIOS) { document.getElementById('other').hidden = false; return; }
+
+  document.getElementById('ios').hidden = false;
+  document.getElementById('open').href = 'lovow://invite/' + encodeURIComponent(token);
+  if (code) {
+    document.getElementById('code').textContent = code.toUpperCase();
+    document.getElementById('codeCard').hidden = false;
+  }
+})();
+</script>
+</main></body>
+</html>
